@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import {
   GraduationCap,
-  GitHub,
+  Globe,
   Mail,
 } from "lucide-react";
-
 function Footer() {
   return (
     <footer className="bg-gray-950 text-gray-300">
