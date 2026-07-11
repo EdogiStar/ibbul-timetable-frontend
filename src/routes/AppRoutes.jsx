@@ -8,6 +8,7 @@ import {
 import MainLayout from "@/layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 
+import Landing from "@/pages/Landing";
 import Login from "@/pages/auth/Login";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Faculties from "@/pages/faculties/Faculties";
@@ -18,6 +19,7 @@ function AppRoutes() {
       <Routes>
 
         {/* Public Routes */}
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
 
         {/* Protected Routes */}
@@ -25,18 +27,14 @@ function AppRoutes() {
           <Route element={<MainLayout />}>
 
             <Route
-              path="/"
-              element={<Navigate to="/dashboard" replace />}
-            />
-
-            <Route
               path="/dashboard"
               element={<Dashboard />}
             />
+
             <Route
-             path="/faculties"
-             element={<Faculties />}
-             />
+              path="/faculties"
+              element={<Faculties />}
+            />
 
           </Route>
         </Route>
@@ -44,7 +42,7 @@ function AppRoutes() {
         {/* Catch-all */}
         <Route
           path="*"
-          element={<Navigate to="/dashboard" replace />}
+          element={<Navigate to="/" replace />}
         />
 
       </Routes>
