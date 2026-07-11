@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   GraduationCap,
-  Github,
+  GitHub,
   Mail,
 } from "lucide-react";
 
@@ -101,7 +101,7 @@ function Footer() {
                 rel="noreferrer"
                 className="flex items-center gap-3 hover:text-emerald-400"
               >
-                <Github size={18} />
+                <GitHub size={18} />
                 GitHub
               </a>
 
