@@ -5,6 +5,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -17,6 +18,8 @@ export function AuthProvider({ children }) {
     if (savedToken) {
       setToken(savedToken);
     }
+
+    setLoading(false);
   }, []);
 
   const login = (userData, jwt) => {
@@ -40,6 +43,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         token,
+        loading,
         login,
         logout,
         isAuthenticated: !!token,
