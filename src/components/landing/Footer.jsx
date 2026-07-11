@@ -100,7 +100,7 @@ function Footer() {
                 rel="noreferrer"
                 className="flex items-center gap-3 hover:text-emerald-400"
               >
-                <GitHub size={18} />
+                <Globe size={18} />
                 GitHub
               </a>
 
