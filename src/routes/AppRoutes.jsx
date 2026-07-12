@@ -27,7 +27,6 @@ import Scheduler from "@/pages/scheduler/Scheduler";
 import Timetables from "@/pages/timetables/Timetables";
 import Users from "@/pages/users/Users";
 import Reports from "@/pages/reports/Reports";
-import Settings from "@/pages/settings/Settings";
 import Profile from "@/pages/profile/Profile";
 
 function AppRoutes() {
@@ -60,7 +59,6 @@ function AppRoutes() {
             <Route path="/timetables" element={<Timetables />} />
             <Route path="/users" element={<Users />} />
             <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />
 
           </Route>
