@@ -64,31 +64,37 @@ function CourseAllocation() {
   }, [search, allocations]);
 
   const loadData = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const [
-        allocationsRes,
-        offeringsRes,
-        lecturersRes,
-      ] = await Promise.all([
-        getCourseAllocations(),
-        getCourseOfferings(),
-        getLecturers(),
-      ]);
+    const [
+      allocationsRes,
+      offeringsRes,
+      lecturersRes,
+    ] = await Promise.all([
+      getCourseAllocations(),
+      getCourseOfferings(),
+      getLecturers(),
+    ]);
 
-      setAllocations(allocationsRes.data);
-      setFiltered(allocationsRes.data);
+    setAllocations(allocationsRes);
+    setFiltered(allocationsRes);
 
-      setCourseOfferings(offeringsRes.data);
-      setLecturers(lecturersRes.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setCourseOfferings(offeringsRes);
+    setLecturers(lecturersRes);
+
+  } catch (error) {
+    console.error("Load Data Error:", error);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to load data."
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getLecturers = async () => {
   const response = await api.get("/lecturers");
-  return response.data;
+  return response.data.data;
 };
 
 export const getLecturerById = async (id) => {

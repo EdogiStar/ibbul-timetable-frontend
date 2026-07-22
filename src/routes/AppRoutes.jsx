@@ -28,6 +28,9 @@ import Timetables from "@/pages/timetables/Timetables";
 import Users from "@/pages/users/Users";
 import Reports from "@/pages/reports/Reports";
 import Profile from "@/pages/profile/Profile";
+import Days from "@/pages/days/Days";
+import TimeSlots from "@/pages/time-slots/TimeSlots";
+
 
 function AppRoutes() {
   return (
@@ -60,7 +63,8 @@ function AppRoutes() {
             <Route path="/users" element={<Users />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/profile" element={<Profile />} />
-
+            <Route path="/days" element={<Days />} />
+            <Route path="/time-slots" element={<TimeSlots />} />
           </Route>
         </Route>
 

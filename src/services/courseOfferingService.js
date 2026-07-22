@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getCourseOfferings = async () => {
   const response = await api.get("/course-offerings");
-  return response.data;
+  return response.data.data;
 };
 
 export const getCourseOfferingById = async (id) => {

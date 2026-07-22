@@ -18,6 +18,7 @@ import {
   BarChart3,
   Settings,
   User,
+  CalendarDays,
   Menu,
   X,
   LogOut,
@@ -33,8 +34,12 @@ const navItems = [
   { path: "/departments", label: "Departments", icon: Building2 },
   { path: "/programmes", label: "Programmes", icon: GraduationCap },
   { path: "/levels", label: "Levels", icon: Layers },
+
   { path: "/sessions", label: "Sessions", icon: Calendar },
   { path: "/semesters", label: "Semesters", icon: Clock },
+  { path: "/days", label: "Days", icon: CalendarDays },
+  { path: "/time-slots", label: "Time Slots", icon: Clock},
+  
   { path: "/lecturers", label: "Lecturers", icon: Users },
   { path: "/venues", label: "Venues", icon: MapPin },
   { path: "/courses", label: "Courses", icon: BookOpen },

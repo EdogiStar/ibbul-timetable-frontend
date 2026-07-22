@@ -127,7 +127,7 @@ function Features() {
             <div className="grid grid-cols-2 gap-6">
 
               <div className="rounded-2xl bg-white/10 p-6 backdrop-blur">
-                <h4 className="text-4xl font-bold">
+                <h4 className="text-2xl md:text-4xl font-bold">
                   100%
                 </h4>
 
@@ -137,7 +137,7 @@ function Features() {
               </div>
 
               <div className="rounded-2xl bg-white/10 p-6 backdrop-blur">
-                <h4 className="text-4xl font-bold">
+                <h4 className="text-2xl md:text-4xl font-bold">
                   Secure
                 </h4>
 
@@ -147,7 +147,7 @@ function Features() {
               </div>
 
               <div className="rounded-2xl bg-white/10 p-6 backdrop-blur">
-                <h4 className="text-4xl font-bold">
+                <h4 className="text-2xl md:text-4xl font-bold">
                   Modern
                 </h4>
 
@@ -157,7 +157,7 @@ function Features() {
               </div>
 
               <div className="rounded-2xl bg-white/10 p-6 backdrop-blur">
-                <h4 className="text-4xl font-bold">
+                <h4 className="text-2xl md:text-4xl font-bold">
                   Scalable
                 </h4>
 

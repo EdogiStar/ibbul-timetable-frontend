@@ -24,7 +24,7 @@ function Workflow() {
       icon: Database,
       title: "3. Manage Course Allocation",
       description:
-        "Assign lecturers and organize course offerings before scheduling begins.",
+        "Assign lecturers and organize course offerings before or after scheduling.",
     },
     {
       icon: CalendarRange,

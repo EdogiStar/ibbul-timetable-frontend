@@ -59,14 +59,6 @@ export default function Login() {
         <p className="mb-8 text-center text-gray-500">
           Sign in to continue
         </p>
-        <div className="mx-auto">
-        <p className="mb-2 text-center text-blue-300">
-        Username: admin@ibbul.edu.ng
-        </p>
-        <p className="mb-2 text-center text-blue-300">
-        Password: Admin@123
-        </p>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
