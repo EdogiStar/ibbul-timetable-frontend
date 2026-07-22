@@ -33,17 +33,3 @@ export const generateNormalTimetable = async () => {
 
   return response.data;
 };
-
-/**
- * Create timetable entry
- */
-export const createTimetableEntry = async (data) => {
-
-  const response = await api.post(
-    "/timetables",
-    data
-  );
-
-  return response.data;
-
-};

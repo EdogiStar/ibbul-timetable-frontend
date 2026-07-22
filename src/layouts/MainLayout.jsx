@@ -46,10 +46,10 @@ const navItems = [
   { path: "/course-offerings", label: "Course Offerings", icon: ClipboardCheck },
   { path: "/course-allocation", label: "Course Allocations", icon: UserCheck },
   { path: "/timetables", label: "Timetables", icon: Grid3X3 },
-  { path: "/scheduler", label: "Scheduler", icon: CalendarSearch },
+
   { path: "/reports", label: "Reports", icon: BarChart3 },
   { path: "/users", label: "User Management", icon: Settings },
-  { path: "/profile", label: "My Profile", icon: User },
+  
 ];
 
 const MainLayout = () => {

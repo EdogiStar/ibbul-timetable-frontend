@@ -23,11 +23,11 @@ import Sessions from "@/pages/sessions/Sessions";
 import Semesters from "@/pages/semesters/Semesters";
 import Lecturers from "@/pages/lecturers/Lecturers";
 import Venues from "@/pages/venues/Venues";
-import Scheduler from "@/pages/scheduler/Scheduler";
+
 import Timetables from "@/pages/timetables/Timetables";
 import Users from "@/pages/users/Users";
 import Reports from "@/pages/reports/Reports";
-import Profile from "@/pages/profile/Profile";
+
 import Days from "@/pages/days/Days";
 import TimeSlots from "@/pages/time-slots/TimeSlots";
 
@@ -58,11 +58,11 @@ function AppRoutes() {
             <Route path="/semesters" element={<Semesters />} />
             <Route path="/lecturers" element={<Lecturers />} />
             <Route path="/venues" element={<Venues />} />
-            <Route path="/scheduler" element={<Scheduler />} />
+            
             <Route path="/timetables" element={<Timetables />} />
             <Route path="/users" element={<Users />} />
             <Route path="/reports" element={<Reports />} />
-            <Route path="/profile" element={<Profile />} />
+            
             <Route path="/days" element={<Days />} />
             <Route path="/time-slots" element={<TimeSlots />} />
           </Route>
