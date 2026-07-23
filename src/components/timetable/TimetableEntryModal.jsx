@@ -4,12 +4,19 @@ import {
   getAvailableCourseAllocations,
 } from "@/services/courseAllocationService";
 
+
 function TimetableEntryModal({
+
   open,
+
   onClose,
+
   onSubmit,
+
   selectedSlot,
+
 }) {
+
 
   /**
    * ----------------------------------------------------
@@ -17,10 +24,9 @@ function TimetableEntryModal({
    * ----------------------------------------------------
    */
   const [form, setForm] = useState({
+
     courseAllocationId: "",
-    dayId: "",
-    timeSlotId: "",
-    venueId: "",
+
   });
 
 
@@ -29,16 +35,32 @@ function TimetableEntryModal({
    * Available Course Allocations
    * ----------------------------------------------------
    */
-  const [courseAllocations, setCourseAllocations] =
-    useState([]);
+  const [
+    courseAllocations,
+    setCourseAllocations
+  ] = useState([]);
 
 
-  const [selectedAllocation, setSelectedAllocation] =
-    useState(null);
+  /**
+   * ----------------------------------------------------
+   * Selected Allocation
+   * ----------------------------------------------------
+   */
+  const [
+    selectedAllocation,
+    setSelectedAllocation
+  ] = useState(null);
 
 
-  const [loadingAllocations, setLoadingAllocations] =
-    useState(false);
+  /**
+   * ----------------------------------------------------
+   * Loading
+   * ----------------------------------------------------
+   */
+  const [
+    loadingAllocations,
+    setLoadingAllocations
+  ] = useState(false);
 
 
   /**
@@ -46,33 +68,41 @@ function TimetableEntryModal({
    * Load Available Course Allocations
    * ----------------------------------------------------
    */
-  const loadCourseAllocations = async () => {
+  const loadCourseAllocations =
+    async () => {
 
-    try {
+      try {
 
-      setLoadingAllocations(true);
+        setLoadingAllocations(
+          true
+        );
 
-      const data =
-        await getAvailableCourseAllocations();
 
-      setCourseAllocations(data || []);
+        const data =
+          await getAvailableCourseAllocations();
 
-    } catch (error) {
 
-      console.error(
-        "Failed to load course allocations:",
-        error
-      );
+        setCourseAllocations(
+          data
+        );
 
-      setCourseAllocations([]);
 
-    } finally {
+      } catch (error) {
 
-      setLoadingAllocations(false);
+        console.error(
+          "Failed to load course allocations:",
+          error
+        );
 
-    }
+      } finally {
 
-  };
+        setLoadingAllocations(
+          false
+        );
+
+      }
+
+    };
 
 
   /**
@@ -82,7 +112,12 @@ function TimetableEntryModal({
    */
   useEffect(() => {
 
-    if (!open) return;
+    if (!open) {
+
+      return;
+
+    }
+
 
     loadCourseAllocations();
 
@@ -91,121 +126,116 @@ function TimetableEntryModal({
 
   /**
    * ----------------------------------------------------
-   * Set Selected Slot
+   * Handle Allocation Selection
    * ----------------------------------------------------
    */
-  useEffect(() => {
+  const handleAllocationChange =
+    (e) => {
 
-    if (!selectedSlot) return;
-
-    setForm({
-      courseAllocationId: "",
-      dayId: selectedSlot.day.id,
-      timeSlotId: selectedSlot.timeSlot.id,
-      venueId: selectedSlot.venue.id,
-    });
-
-    setSelectedAllocation(null);
-
-  }, [selectedSlot]);
+      const allocationId =
+        e.target.value;
 
 
-  /**
-   * ----------------------------------------------------
-   * Handle Course Allocation Selection
-   * ----------------------------------------------------
-   */
-  const handleAllocationChange = (e) => {
+      const allocation =
+        courseAllocations.find(
 
-    const allocationId = e.target.value;
+          item =>
 
-    const allocation =
-      courseAllocations.find(
-        (item) => item.id === allocationId
+            item.id ===
+            allocationId
+
+        );
+
+
+      setSelectedAllocation(
+        allocation || null
       );
 
-    setSelectedAllocation(
-      allocation || null
-    );
 
-    setForm((previous) => ({
+      setForm({
 
-      ...previous,
+        courseAllocationId:
+          allocationId,
 
-      courseAllocationId:
-        allocationId,
+      });
 
-    }));
-
-  };
+    };
 
 
   /**
    * ----------------------------------------------------
-   * Handle Submit
+   * Submit
    * ----------------------------------------------------
    */
-  const handleSubmit = (e) => {
+  const handleSubmit =
+    (e) => {
 
-    e.preventDefault();
-
-    if (!form.courseAllocationId) {
-      return;
-    }
-
-    onSubmit({
-
-      course_allocation_id:
-        form.courseAllocationId,
-
-      day_id:
-        form.dayId,
-
-      time_slot_id:
-        form.timeSlotId,
-
-      venue_id:
-        form.venueId,
-
-    });
-
-  };
+      e.preventDefault();
 
 
-  /**
-   * ----------------------------------------------------
-   * Close Modal
-   * ----------------------------------------------------
-   */
-  const handleClose = () => {
+      if (
+        !form.courseAllocationId
+      ) {
 
-    setForm({
+        return;
 
-      courseAllocationId: "",
-
-      dayId: "",
-
-      timeSlotId: "",
-
-      venueId: "",
-
-    });
-
-    setSelectedAllocation(null);
-
-    onClose();
-
-  };
+      }
 
 
-  if (!open) return null;
+      /**
+       * ------------------------------------------------
+       * Send Scheduling Request
+       * ------------------------------------------------
+       *
+       * IMPORTANT:
+       *
+       * The modal does NOT insert into
+       * timetable_entries.
+       *
+       * It sends a scheduling request.
+       *
+       * The scheduler decides whether
+       * the selected slot is valid.
+       *
+       * ------------------------------------------------
+       */
+      onSubmit({
+
+        courseAllocationId:
+          form.courseAllocationId,
+
+
+        targetSlot: {
+
+          dayId:
+            selectedSlot.day.id,
+
+          timeSlotId:
+            selectedSlot.timeSlot.id,
+
+          venueId:
+            selectedSlot.venue.id,
+
+        },
+
+      });
+
+    };
+
+
+  if (!open) {
+
+    return null;
+
+  }
 
 
   return (
 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
 
-      <div className="w-full max-w-3xl rounded-xl bg-white shadow-xl">
+      <div className="w-full max-w-2xl rounded-xl bg-white shadow-xl">
+
 
         {/* ----------------------------------------
             Header
@@ -217,13 +247,13 @@ function TimetableEntryModal({
 
             <h2 className="text-xl font-semibold">
 
-              Add Timetable Entry
+              Schedule Course
 
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
 
-              Create a lecture for the selected venue.
+              Select a course allocation for this timetable slot.
 
             </p>
 
@@ -232,9 +262,7 @@ function TimetableEntryModal({
 
           <button
 
-            type="button"
-
-            onClick={handleClose}
+            onClick={onClose}
 
             className="rounded-lg px-3 py-2 text-gray-500 hover:bg-gray-100"
 
@@ -253,19 +281,21 @@ function TimetableEntryModal({
 
         <form
 
-          onSubmit={handleSubmit}
+          onSubmit={
+            handleSubmit
+          }
 
           className="space-y-5 p-6"
 
         >
 
+
           {/* ----------------------------------------
-              Selected Day / Time Slot / Venue
+              Selected Slot
           ---------------------------------------- */}
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-            {/* Day */}
 
             <div>
 
@@ -275,10 +305,14 @@ function TimetableEntryModal({
 
               </label>
 
+
               <input
 
                 value={
-                  selectedSlot?.day?.name || ""
+                  selectedSlot
+                    ?.day
+                    ?.name ||
+                  ""
                 }
 
                 readOnly
@@ -289,8 +323,6 @@ function TimetableEntryModal({
 
             </div>
 
-
-            {/* Time Slot */}
 
             <div>
 
@@ -300,10 +332,14 @@ function TimetableEntryModal({
 
               </label>
 
+
               <input
 
                 value={
-                  selectedSlot?.timeSlot?.code || ""
+                  selectedSlot
+                    ?.timeSlot
+                    ?.code ||
+                  ""
                 }
 
                 readOnly
@@ -315,8 +351,6 @@ function TimetableEntryModal({
             </div>
 
 
-            {/* Venue */}
-
             <div>
 
               <label className="mb-2 block text-sm font-medium">
@@ -325,10 +359,14 @@ function TimetableEntryModal({
 
               </label>
 
+
               <input
 
                 value={
-                  selectedSlot?.venue?.venue_code || ""
+                  selectedSlot
+                    ?.venue
+                    ?.venue_code ||
+                  ""
                 }
 
                 readOnly
@@ -353,6 +391,7 @@ function TimetableEntryModal({
               Course Allocation
 
             </label>
+
 
             <select
 
@@ -380,7 +419,9 @@ function TimetableEntryModal({
 
                   ? "Loading course allocations..."
 
-                  : "Select Course Allocation"}
+                  : "Select Course Allocation"
+
+                }
 
               </option>
 
@@ -388,17 +429,21 @@ function TimetableEntryModal({
               {!loadingAllocations &&
 
                 courseAllocations.map(
-                  (allocation) => {
+
+                  allocation => {
+
 
                     const course =
                       allocation
                         .course_offerings
                         ?.courses;
 
+
                     const programme =
                       allocation
                         .course_offerings
                         ?.programmes;
+
 
                     const level =
                       allocation
@@ -422,19 +467,22 @@ function TimetableEntryModal({
 
                         {course
                           ?.course_code ||
-                          "No Course"}
+                          "No Course"
+                        }
 
                         {" - "}
 
                         {programme
                           ?.code ||
-                          "No Programme"}
+                          "No Programme"
+                        }
 
                         {" - "}
 
                         {level
                           ?.name ||
-                          "No Level"}
+                          "No Level"
+                        }
 
                       </option>
 
@@ -442,7 +490,9 @@ function TimetableEntryModal({
 
                   }
 
-                )}
+                )
+
+              }
 
             </select>
 
@@ -457,7 +507,7 @@ function TimetableEntryModal({
 
             <div className="rounded-lg border bg-gray-50 p-4">
 
-              <h3 className="mb-3 font-semibold text-gray-800">
+              <h3 className="mb-3 font-semibold">
 
                 Course Allocation Details
 
@@ -467,8 +517,6 @@ function TimetableEntryModal({
               <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
 
 
-                {/* Course */}
-
                 <div>
 
                   <span className="text-gray-500">
@@ -476,6 +524,7 @@ function TimetableEntryModal({
                     Course:
 
                   </span>{" "}
+
 
                   <span className="font-medium">
 
@@ -500,8 +549,6 @@ function TimetableEntryModal({
                 </div>
 
 
-                {/* Programme */}
-
                 <div>
 
                   <span className="text-gray-500">
@@ -509,6 +556,7 @@ function TimetableEntryModal({
                     Programme:
 
                   </span>{" "}
+
 
                   <span className="font-medium">
 
@@ -525,8 +573,6 @@ function TimetableEntryModal({
                 </div>
 
 
-                {/* Level */}
-
                 <div>
 
                   <span className="text-gray-500">
@@ -534,6 +580,7 @@ function TimetableEntryModal({
                     Level:
 
                   </span>{" "}
+
 
                   <span className="font-medium">
 
@@ -550,8 +597,6 @@ function TimetableEntryModal({
                 </div>
 
 
-                {/* Lecturer */}
-
                 <div>
 
                   <span className="text-gray-500">
@@ -559,6 +604,7 @@ function TimetableEntryModal({
                     Lecturer:
 
                   </span>{" "}
+
 
                   <span className="font-medium">
 
@@ -573,72 +619,30 @@ function TimetableEntryModal({
 
                 </div>
 
-
-                {/* Academic Session */}
-
-                <div>
-
-                  <span className="text-gray-500">
-
-                    Session:
-
-                  </span>{" "}
-
-                  <span className="font-medium">
-
-                    {
-                      selectedAllocation
-                        .course_offerings
-                        ?.academic_sessions
-                        ?.name ||
-                      "N/A"
-                    }
-
-                  </span>
-
-                </div>
-
-
-                {/* Semester */}
-
-                <div>
-
-                  <span className="text-gray-500">
-
-                    Semester:
-
-                  </span>{" "}
-
-                  <span className="font-medium">
-
-                    {
-                      selectedAllocation
-                        .course_offerings
-                        ?.semesters
-                        ?.name ||
-                      "N/A"
-                    }
-
-                  </span>
-
-                </div>
-
               </div>
 
             </div>
 
           )}
-          
-                    {/* ----------------------------------------
+
+
+          {/* ----------------------------------------
               Actions
           ---------------------------------------- */}
 
           <div className="flex justify-end gap-3 border-t pt-5">
 
+
             <button
+
               type="button"
-              onClick={handleClose}
+
+              onClick={
+                onClose
+              }
+
               className="rounded-lg border px-5 py-2.5 transition hover:bg-gray-50"
+
             >
 
               Cancel
@@ -647,19 +651,28 @@ function TimetableEntryModal({
 
 
             <button
+
               type="submit"
+
               disabled={
+
                 loadingAllocations ||
+
                 !form.courseAllocationId
+
               }
+
               className="rounded-lg bg-green-600 px-5 py-2.5 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+
             >
 
-              Save Timetable Entry
+              Schedule Course
 
             </button>
 
+
           </div>
+
 
         </form>
 
@@ -670,5 +683,6 @@ function TimetableEntryModal({
   );
 
 }
+
 
 export default TimetableEntryModal;

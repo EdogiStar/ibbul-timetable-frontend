@@ -33,3 +33,21 @@ export const generateNormalTimetable = async () => {
 
   return response.data;
 };
+
+/**
+ * Generate Normal Timetable
+ * For a single course allocation
+ * in a specific timetable slot.
+ */
+export const generateNormalTimetableForOne = async (
+  data
+) => {
+
+  const response = await api.post(
+    "/timetables/normal/generate-single",
+    data
+  );
+
+  return response.data;
+
+};

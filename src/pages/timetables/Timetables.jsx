@@ -14,15 +14,12 @@ import TimetableFilters
 import TimetableGrid
   from "@/components/timetable/TimetableGrid";
 
-import TimetableEntryModal
-  from "@/components/timetable/TimetableEntryModal";
-
-
+import TimetableEntryModal from "@/components/timetable/TimetableEntryModal";
+  
 import {
   getTimetable,
-  createTimetableEntry,
+  generateNormalTimetableForOne,
 } from "@/services/timetableService";
-
 
 import { getDays }
   from "@/services/dayService";
@@ -440,6 +437,46 @@ function Timetables() {
     setOpenModal(true);
 
   };
+  
+  /**
+ * ----------------------------------------------------
+ * Create Single Normal Schedule
+ * ----------------------------------------------------
+ */
+const handleCreateSchedule = async (data) => {
+
+  try {
+
+    setLoading(true);
+
+    await generateNormalTimetableForOne(data);
+
+    toast.success(
+      "Course scheduled successfully."
+    );
+
+    setOpenModal(false);
+
+    setSelectedSlot(null);
+
+    await loadTimetable(filters);
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to schedule course."
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
 
 
   /**
@@ -631,28 +668,24 @@ function Timetables() {
       {/* ----------------------------------------
           Add Timetable Entry Modal
       ---------------------------------------- */}
-
+      
       <TimetableEntryModal
 
-        open={openModal}
+  open={openModal}
 
-        onClose={() => {
+  onClose={() => {
 
-          setOpenModal(false);
+    setOpenModal(false);
 
-          setSelectedSlot(null);
+    setSelectedSlot(null);
 
-        }}
+  }}
 
-        onSubmit={
-          handleSubmitSchedule
-        }
+  onSubmit={handleCreateSchedule}
 
-        selectedSlot={
-          selectedSlot
-        }
+  selectedSlot={selectedSlot}
 
-      />
+/>
 
     </div>
 
