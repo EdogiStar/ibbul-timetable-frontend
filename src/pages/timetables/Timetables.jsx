@@ -19,6 +19,7 @@ import TimetableEntryModal from "@/components/timetable/TimetableEntryModal";
 import {
   getTimetable,
   generateNormalTimetableForOne,
+  getAvailableVenues,
 } from "@/services/timetableService";
 
 import { getDays }
@@ -75,7 +76,8 @@ function Timetables() {
   const [loading, setLoading] =
     useState(true);
 
-
+    const [availableVenues, setAvailableVenues] =
+  useState([]);
   /**
    * ----------------------------------------------------
    * Timetable Entry Modal
@@ -417,26 +419,59 @@ function Timetables() {
    * ----------------------------------------------------
    */
 
-  const handleAddSchedule = ({
-    day,
-    timeSlot,
-    venue,
-  }) => {
+  const handleAddSchedule = async ({
+  day,
+  timeSlot,
+}) => {
+
+  try {
 
     setSelectedSlot({
-
       day,
-
       timeSlot,
-
-      venue,
-
     });
 
+    setAvailableVenues([]);
 
     setOpenModal(true);
 
-  };
+    const venues =
+      await getAvailableVenues({
+
+        dayId:
+          day.id,
+
+        timeSlotId:
+          timeSlot.id,
+
+      });
+
+    setAvailableVenues(
+      venues
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to load available venues."
+    );
+
+  }
+
+};
+
+const handleCloseModal = () => {
+
+  setOpenModal(false);
+
+  setSelectedSlot(null);
+
+  setAvailableVenues([]);
+
+};
   
   /**
  * ----------------------------------------------------
@@ -586,110 +621,80 @@ const handleCreateSchedule = async (data) => {
 
   return (
 
-    <div className="space-y-6 p-6">
+  <div className="space-y-6 p-6">
 
-      <PageHeader
-        title="Timetables"
-        subtitle="View and filter academic timetables."
+    <PageHeader
+      title="Timetables"
+      subtitle="View and filter academic timetables."
+    />
+
+
+    <TimetableFilters
+      filters={filters}
+      onChange={handleChange}
+      onApply={handleApply}
+      onReset={handleReset}
+
+      sessions={sessions}
+      semesters={semesters}
+      faculties={faculties}
+      departments={departments}
+      programmes={programmes}
+      levels={levels}
+      lecturers={lecturers}
+      courses={courses}
+      venues={venues}
+    />
+
+
+    {loading ? (
+
+      <div className="rounded-xl border bg-white p-10 text-center text-gray-500 shadow-sm">
+
+        Loading timetable...
+
+      </div>
+
+    ) : (
+
+      <TimetableGrid
+        timetable={timetable}
+        days={days}
+        timeSlots={timeSlots}
+        timetableLookup={timetableLookup}
+        onAddSchedule={handleAddSchedule}
       />
 
-
-      {/* ----------------------------------------
-          Timetable Filters
-      ---------------------------------------- */}
-
-      <TimetableFilters
-
-        filters={filters}
-
-        onChange={handleChange}
-
-        onApply={handleApply}
-
-        onReset={handleReset}
+    )}
 
 
-        sessions={sessions}
+    <TimetableEntryModal
 
-        semesters={semesters}
+      open={
+        openModal
+      }
 
-        faculties={faculties}
+      onClose={
+        handleCloseModal
+      }
 
-        departments={departments}
+      onSubmit={
+        handleSubmitSchedule
+      }
 
-        programmes={programmes}
+      selectedSlot={
+        selectedSlot
+      }
 
-        levels={levels}
+      availableVenues={
+        availableVenues
+      }
 
-        lecturers={lecturers}
+    />
 
-        courses={courses}
+  </div>
 
-        venues={venues}
-
-      />
-
-
-      {/* ----------------------------------------
-          Timetable Grid
-      ---------------------------------------- */}
-
-      {loading ? (
-
-        <div className="rounded-xl border bg-white p-10 text-center text-gray-500 shadow-sm">
-
-          Loading timetable...
-
-        </div>
-
-      ) : (
-
-        <TimetableGrid
-
-          timetable={timetable}
-
-          days={days}
-
-          timeSlots={timeSlots}
-
-          venues={venues}
-
-          timetableLookup={timetableLookup}
-
-          onAddSchedule={
-            handleAddSchedule
-          }
-
-        />
-
-      )}
-
-
-      {/* ----------------------------------------
-          Add Timetable Entry Modal
-      ---------------------------------------- */}
-      
-      <TimetableEntryModal
-
-  open={openModal}
-
-  onClose={() => {
-
-    setOpenModal(false);
-
-    setSelectedSlot(null);
-
-  }}
-
-  onSubmit={handleCreateSchedule}
-
-  selectedSlot={selectedSlot}
-
-/>
-
-    </div>
-
-  );
+);
 
 }
 

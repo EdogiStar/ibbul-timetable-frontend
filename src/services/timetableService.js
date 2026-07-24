@@ -51,3 +51,24 @@ export const generateNormalTimetableForOne = async (
   return response.data;
 
 };
+
+/**
+ * Get available venues for a specific
+ * day and time slot.
+ */
+export const getAvailableVenues = async ({
+  dayId,
+  timeSlotId,
+}) => {
+  const response = await api.get(
+    "/timetables/available-venues",
+    {
+      params: {
+        dayId,
+        timeSlotId,
+      },
+    }
+  );
+
+  return response.data.data;
+};
