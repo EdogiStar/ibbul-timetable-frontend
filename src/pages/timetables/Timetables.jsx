@@ -1,60 +1,26 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import PageHeader from "@/components/PageHeader";
 
-import TimetableFilters
-  from "@/components/timetable/TimetableFilters";
-
-import TimetableGrid
-  from "@/components/timetable/TimetableGrid";
-
-import TimetableEntryModal from "@/components/timetable/TimetableEntryModal";
+import TimetableFilters from "@/components/timetable/TimetableFilters";
+import TimetableGrid from "@/components/timetable/TimetableGrid";
+import TimetableGenerateModal from "@/components/timetable/TimetableGenerateModal";
   
-import {
-  getTimetable,
-  generateNormalTimetableForOne,
-  getAvailableVenues,
-} from "@/services/timetableService";
+import { getTimetable } from "@/services/timetableService";
 
-import { getDays }
-  from "@/services/dayService";
+import { getDays } from "@/services/dayService";
+import { getTimeSlots } from "@/services/timeSlotService";
 
-import { getTimeSlots }
-  from "@/services/timeSlotService";
-
-import { getSessions }
-  from "@/services/sessionService";
-
-import { getSemesters }
-  from "@/services/semesterService";
-
-import { getFaculties }
-  from "@/services/facultyService";
-
-import { getDepartments }
-  from "@/services/departmentService";
-
-import { getProgrammes }
-  from "@/services/programmeService";
-
-import { getLevels }
-  from "@/services/levelService";
-
-import { getLecturers }
-  from "@/services/lecturerService";
-
-import { getCourses }
-  from "@/services/courseService";
-
-import { getVenues }
-  from "@/services/venueService";
-
+import { getSessions } from "@/services/sessionService";
+import { getSemesters } from "@/services/semesterService";
+import { getFaculties } from "@/services/facultyService";
+import { getDepartments } from "@/services/departmentService";
+import { getProgrammes } from "@/services/programmeService";
+import { getLevels } from "@/services/levelService";
+import { getLecturers } from "@/services/lecturerService";
+import { getCourses } from "@/services/courseService";
+import { getVenues } from "@/services/venueService";
 
 function Timetables() {
 
@@ -64,32 +30,40 @@ function Timetables() {
    * ----------------------------------------------------
    */
 
-  const [timetable, setTimetable] =
-    useState([]);
+  const [timetable, setTimetable] = useState([]);
 
-  const [days, setDays] =
-    useState([]);
+  const [days, setDays] = useState([]);
 
-  const [timeSlots, setTimeSlots] =
-    useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-    const [availableVenues, setAvailableVenues] =
-  useState([]);
+
   /**
    * ----------------------------------------------------
    * Timetable Entry Modal
    * ----------------------------------------------------
    */
 
-  const [openModal, setOpenModal] =
+  const [openModal, setOpenModal] = useState(false);
+
+  const [selectedSlot, setSelectedSlot] = useState(null);
+
+
+  /**
+   * ----------------------------------------------------
+   * Generate Timetable Modal
+   * ----------------------------------------------------
+   */
+
+  const [openGenerateModal, setOpenGenerateModal] =
     useState(false);
 
-  const [selectedSlot, setSelectedSlot] =
-    useState(null);
+    const handleGenerated = async () => {
 
+  await loadTimetable(filters);
+
+};
 
   /**
    * ----------------------------------------------------
@@ -97,32 +71,23 @@ function Timetables() {
    * ----------------------------------------------------
    */
 
-  const [sessions, setSessions] =
-    useState([]);
+  const [sessions, setSessions] = useState([]);
 
-  const [semesters, setSemesters] =
-    useState([]);
+  const [semesters, setSemesters] = useState([]);
 
-  const [faculties, setFaculties] =
-    useState([]);
+  const [faculties, setFaculties] = useState([]);
 
-  const [departments, setDepartments] =
-    useState([]);
+  const [departments, setDepartments] = useState([]);
 
-  const [programmes, setProgrammes] =
-    useState([]);
+  const [programmes, setProgrammes] = useState([]);
 
-  const [levels, setLevels] =
-    useState([]);
+  const [levels, setLevels] = useState([]);
 
-  const [lecturers, setLecturers] =
-    useState([]);
+  const [lecturers, setLecturers] = useState([]);
 
-  const [courses, setCourses] =
-    useState([]);
+  const [courses, setCourses] = useState([]);
 
-  const [venues, setVenues] =
-    useState([]);
+  const [venues, setVenues] = useState([]);
 
 
   /**
@@ -167,8 +132,9 @@ function Timetables() {
     loadFilterData();
 
   }, []);
-  
-    /**
+
+
+  /**
    * ----------------------------------------------------
    * Load Timetable
    * ----------------------------------------------------
@@ -183,13 +149,9 @@ function Timetables() {
       setLoading(true);
 
       const response =
-        await getTimetable(
-          appliedFilters
-        );
+        await getTimetable(appliedFilters);
 
-      setTimetable(
-        response.data
-      );
+      setTimetable(response.data);
 
     } catch (error) {
 
@@ -222,49 +184,31 @@ function Timetables() {
       const [
 
         sessionsResponse,
-
         semestersResponse,
-
         facultiesResponse,
-
         departmentsResponse,
-
         programmesResponse,
-
         levelsResponse,
-
         lecturersResponse,
-
         coursesResponse,
-
         venuesResponse,
 
         daysResponse,
-
         timeSlotsResponse,
 
       ] = await Promise.all([
 
         getSessions(),
-
         getSemesters(),
-
         getFaculties(),
-
         getDepartments(),
-
         getProgrammes(),
-
         getLevels(),
-
         getLecturers(),
-
         getCourses(),
-
         getVenues(),
 
         getDays(),
-
         getTimeSlots(),
 
       ]);
@@ -337,18 +281,16 @@ function Timetables() {
 
     const {
       name,
-      value,
+      value
     } = e.target;
 
-    setFilters(
-      (previous) => ({
+    setFilters((previous) => ({
 
-        ...previous,
+      ...previous,
 
-        [name]: value,
+      [name]: value,
 
-      })
-    );
+    }));
 
   };
 
@@ -361,9 +303,7 @@ function Timetables() {
 
   const handleApply = async () => {
 
-    await loadTimetable(
-      filters
-    );
+    await loadTimetable(filters);
 
   };
 
@@ -398,11 +338,7 @@ function Timetables() {
 
     };
 
-
-    setFilters(
-      resetFilters
-    );
-
+    setFilters(resetFilters);
 
     await loadTimetable();
 
@@ -413,156 +349,51 @@ function Timetables() {
    * ----------------------------------------------------
    * Add Timetable Entry
    * ----------------------------------------------------
-   *
-   * Called when the user clicks (+)
-   * on a free venue.
-   * ----------------------------------------------------
    */
 
-  const handleAddSchedule = async ({
-  day,
-  timeSlot,
-}) => {
-
-  try {
+  const handleAddSchedule = ({
+    day,
+    timeSlot,
+    venue,
+  }) => {
 
     setSelectedSlot({
-      day,
-      timeSlot,
-    });
 
-    setAvailableVenues([]);
+      day,
+
+      timeSlot,
+
+      venue,
+
+    });
 
     setOpenModal(true);
 
-    const venues =
-      await getAvailableVenues({
-
-        dayId:
-          day.id,
-
-        timeSlotId:
-          timeSlot.id,
-
-      });
-
-    setAvailableVenues(
-      venues
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    toast.error(
-      error.response?.data?.message ||
-      "Failed to load available venues."
-    );
-
-  }
-
-};
-
-const handleCloseModal = () => {
-
-  setOpenModal(false);
-
-  setSelectedSlot(null);
-
-  setAvailableVenues([]);
-
-};
-  
-  /**
- * ----------------------------------------------------
- * Create Single Normal Schedule
- * ----------------------------------------------------
- */
-const handleCreateSchedule = async (data) => {
-
-  try {
-
-    setLoading(true);
-
-    await generateNormalTimetableForOne(data);
-
-    toast.success(
-      "Course scheduled successfully."
-    );
-
-    setOpenModal(false);
-
-    setSelectedSlot(null);
-
-    await loadTimetable(filters);
-
-  } catch (error) {
-
-    console.error(error);
-
-    toast.error(
-      error.response?.data?.message ||
-      "Failed to schedule course."
-    );
-
-  } finally {
-
-    setLoading(false);
-
-  }
-
-};
+  };
 
 
   /**
    * ----------------------------------------------------
-   * Submit New Timetable Entry
+   * Open Generate Timetable Modal
    * ----------------------------------------------------
    */
 
-  const handleSubmitSchedule = async (
-    payload
-  ) => {
+  const handleOpenGenerateModal = () => {
 
-    try {
+    setOpenGenerateModal(true);
 
-      await createTimetableEntry(
-        payload
-      );
+  };
 
 
-      toast.success(
-        "Timetable entry added successfully."
-      );
+  /**
+   * ----------------------------------------------------
+   * Close Generate Timetable Modal
+   * ----------------------------------------------------
+   */
 
+  const handleCloseGenerateModal = () => {
 
-      setOpenModal(false);
-
-      setSelectedSlot(null);
-
-
-      await loadTimetable(
-        filters
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Failed to create timetable entry:",
-        error
-      );
-
-
-      toast.error(
-
-        error.response?.data?.message ||
-
-        "Failed to add timetable entry."
-
-      );
-
-    }
+    setOpenGenerateModal(false);
 
   };
 
@@ -571,49 +402,33 @@ const handleCreateSchedule = async (data) => {
    * ----------------------------------------------------
    * Timetable Lookup
    * ----------------------------------------------------
-   *
-   * Creates a fast lookup object:
-   *
-   * {
-   *   "dayId-timeSlotId": {
-   *      venueId: timetableEntry
-   *   }
-   * }
-   * ----------------------------------------------------
    */
 
   const timetableLookup = useMemo(() => {
 
     const lookup = {};
 
+    timetable.forEach((entry) => {
 
-    timetable.forEach(
-      (entry) => {
+      const key =
+        `${entry.day_id}-${entry.time_slot_id}`;
 
-        const key =
-          `${entry.day_id}-${entry.time_slot_id}`;
+      if (!lookup[key]) {
 
-
-        if (!lookup[key]) {
-
-          lookup[key] = {};
-
-        }
-
-
-        lookup[key][
-          entry.venue_id
-        ] = entry;
+        lookup[key] = {};
 
       }
-    );
 
+      lookup[key][entry.venue_id] = entry;
+
+    });
 
     return lookup;
 
   }, [timetable]);
-  
-    /**
+
+
+  /**
    * ----------------------------------------------------
    * Render
    * ----------------------------------------------------
@@ -621,82 +436,156 @@ const handleCreateSchedule = async (data) => {
 
   return (
 
-  <div className="space-y-6 p-6">
+    <div className="space-y-6 p-6">
 
-    <PageHeader
-      title="Timetables"
-      subtitle="View and filter academic timetables."
-    />
+      {/* ==================================================
+          Page Header
+      ================================================== */}
 
-
-    <TimetableFilters
-      filters={filters}
-      onChange={handleChange}
-      onApply={handleApply}
-      onReset={handleReset}
-
-      sessions={sessions}
-      semesters={semesters}
-      faculties={faculties}
-      departments={departments}
-      programmes={programmes}
-      levels={levels}
-      lecturers={lecturers}
-      courses={courses}
-      venues={venues}
-    />
+      <PageHeader
+        title="Timetables"
+        subtitle="View and manage academic timetables."
+      />
 
 
-    {loading ? (
+      {/* ==================================================
+          Page Actions
+      ================================================== */}
 
-      <div className="rounded-xl border bg-white p-10 text-center text-gray-500 shadow-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-        Loading timetable...
+        <div>
+
+          <h2 className="text-lg font-semibold text-gray-900">
+            Academic Timetable
+          </h2>
+
+          <p className="text-sm text-gray-500">
+            Generate and manage scheduled lectures.
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          onClick={handleOpenGenerateModal}
+          className="
+            inline-flex
+            items-center
+            justify-center
+            rounded-lg
+            bg-green-600
+            px-5
+            py-2.5
+            text-sm
+            font-semibold
+            text-white
+            shadow-sm
+            transition
+            hover:bg-green-700
+            focus:outline-none
+            focus:ring-2
+            focus:ring-green-500
+            focus:ring-offset-2
+          "
+        >
+
+          Generate Timetable
+
+        </button>
 
       </div>
 
-    ) : (
 
-      <TimetableGrid
-        timetable={timetable}
-        days={days}
-        timeSlots={timeSlots}
-        timetableLookup={timetableLookup}
-        onAddSchedule={handleAddSchedule}
+      {/* ==================================================
+          Filters
+      ================================================== */}
+
+      <TimetableFilters
+
+        filters={filters}
+
+        onChange={handleChange}
+
+        onApply={handleApply}
+
+        onReset={handleReset}
+
+        sessions={sessions}
+
+        semesters={semesters}
+
+        faculties={faculties}
+
+        departments={departments}
+
+        programmes={programmes}
+
+        levels={levels}
+
+        lecturers={lecturers}
+
+        courses={courses}
+
+        venues={venues}
+
       />
 
-    )}
+
+      {/* ==================================================
+          Timetable Grid
+      ================================================== */}
+
+      {loading ? (
+
+        <div className="
+          rounded-xl
+          border
+          bg-white
+          p-10
+          text-center
+          text-gray-500
+          shadow-sm
+        ">
+
+          Loading timetable...
+
+        </div>
+
+      ) : (
+
+        <TimetableGrid
+
+          timetable={timetable}
+
+          days={days}
+
+          timeSlots={timeSlots}
+
+          venues={venues}
+
+          timetableLookup={timetableLookup}
+
+          onAddSchedule={handleAddSchedule}
+
+        />
+
+      )}
 
 
-    <TimetableEntryModal
+      <TimetableGenerateModal
 
-      open={
-        openModal
-      }
+  open={openGenerateModal}
 
-      onClose={
-        handleCloseModal
-      }
+  onClose={handleCloseGenerateModal}
 
-      onSubmit={
-        handleSubmitSchedule
-      }
+  onGenerated={handleGenerated}
 
-      selectedSlot={
-        selectedSlot
-      }
-
-      availableVenues={
-        availableVenues
-      }
-
-    />
-
-  </div>
-
+/>
+</div>
 );
 
 }
-
 
 export default Timetables;
