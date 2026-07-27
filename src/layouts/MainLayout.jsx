@@ -151,12 +151,12 @@ const MainLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main
-        className={cn(
-          "flex flex-1 flex-col transition-all duration-300",
-          sidebarOpen ? "ml-64" : "ml-20"
-        )}
-      >
+<main
+  className={cn(
+    "flex flex-1 flex-col min-w-0 overflow-hidden transition-all duration-300",
+    sidebarOpen ? "ml-64" : "ml-20"
+  )}
+>
         {/* Top Navbar */}
         <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-card px-6">
           <button
@@ -183,9 +183,9 @@ const MainLayout = () => {
           </div>
         </header>
 
-        <div className="flex-1">
-          <Outlet />
-        </div>
+        <div className="flex-1 min-w-0 overflow-hidden">
+  <Outlet />
+</div>
       </main>
     </div>
   );

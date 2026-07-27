@@ -6,7 +6,7 @@ import PageHeader from "@/components/PageHeader";
 import TimetableFilters from "@/components/timetable/TimetableFilters";
 import TimetableGrid from "@/components/timetable/TimetableGrid";
 import TimetableGenerateModal from "@/components/timetable/TimetableGenerateModal";
-  
+
 import { getTimetable } from "@/services/timetableService";
 
 import { getDays } from "@/services/dayService";
@@ -22,136 +22,98 @@ import { getLecturers } from "@/services/lecturerService";
 import { getCourses } from "@/services/courseService";
 import { getVenues } from "@/services/venueService";
 
+
 function Timetables() {
 
-  /**
-   * ----------------------------------------------------
-   * Timetable Data
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Timetable Data
+  // ----------------------------------------------------
 
   const [timetable, setTimetable] = useState([]);
-
   const [days, setDays] = useState([]);
-
   const [timeSlots, setTimeSlots] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
 
-  /**
-   * ----------------------------------------------------
-   * Timetable Entry Modal
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Timetable Entry Modal
+  // ----------------------------------------------------
 
   const [openModal, setOpenModal] = useState(false);
-
   const [selectedSlot, setSelectedSlot] = useState(null);
 
 
-  /**
-   * ----------------------------------------------------
-   * Generate Timetable Modal
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Generate Timetable Modal
+  // ----------------------------------------------------
 
-  const [openGenerateModal, setOpenGenerateModal] =
-    useState(false);
+  const [openGenerateModal, setOpenGenerateModal] = useState(false);
 
-    const handleGenerated = async () => {
 
-  await loadTimetable(filters);
-
-};
-
-  /**
-   * ----------------------------------------------------
-   * Filter Options
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Filter Options
+  // ----------------------------------------------------
 
   const [sessions, setSessions] = useState([]);
-
   const [semesters, setSemesters] = useState([]);
-
   const [faculties, setFaculties] = useState([]);
-
   const [departments, setDepartments] = useState([]);
-
   const [programmes, setProgrammes] = useState([]);
-
   const [levels, setLevels] = useState([]);
-
   const [lecturers, setLecturers] = useState([]);
-
   const [courses, setCourses] = useState([]);
-
   const [venues, setVenues] = useState([]);
 
 
-  /**
-   * ----------------------------------------------------
-   * Filters
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Filters
+  // ----------------------------------------------------
 
-  const [filters, setFilters] = useState({
-
+  const emptyFilters = {
     sessionId: "",
-
     semesterId: "",
-
     facultyId: "",
-
     departmentId: "",
-
     programmeId: "",
-
     levelId: "",
-
     lecturerId: "",
-
     courseId: "",
-
     venueId: "",
+  };
 
-  });
+  const [filters, setFilters] = useState(emptyFilters);
 
 
-  /**
-   * ----------------------------------------------------
-   * Initial Load
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // UI State
+  // ----------------------------------------------------
+
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+
+  // ----------------------------------------------------
+  // Initial Load
+  // ----------------------------------------------------
 
   useEffect(() => {
-
     loadTimetable();
-
     loadFilterData();
-
   }, []);
 
 
-  /**
-   * ----------------------------------------------------
-   * Load Timetable
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Load Timetable
+  // ----------------------------------------------------
 
-  const loadTimetable = async (
-    appliedFilters = {}
-  ) => {
+  const loadTimetable = async (appliedFilters = {}) => {
 
     try {
 
       setLoading(true);
 
-      const response =
-        await getTimetable(appliedFilters);
+      const response = await getTimetable(appliedFilters);
 
-      setTimetable(response.data);
+      setTimetable(response.data || []);
 
     } catch (error) {
 
@@ -171,18 +133,15 @@ function Timetables() {
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Load Filter Data
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Load Filter Data
+  // ----------------------------------------------------
 
   const loadFilterData = async () => {
 
     try {
 
       const [
-
         sessionsResponse,
         semestersResponse,
         facultiesResponse,
@@ -192,12 +151,9 @@ function Timetables() {
         lecturersResponse,
         coursesResponse,
         venuesResponse,
-
         daysResponse,
         timeSlotsResponse,
-
       ] = await Promise.all([
-
         getSessions(),
         getSemesters(),
         getFaculties(),
@@ -207,149 +163,90 @@ function Timetables() {
         getLecturers(),
         getCourses(),
         getVenues(),
-
         getDays(),
         getTimeSlots(),
-
       ]);
 
 
-      setSessions(
-        sessionsResponse.data
-      );
-
-      setSemesters(
-        semestersResponse.data
-      );
-
-      setFaculties(
-        facultiesResponse.data
-      );
-
-      setDepartments(
-        departmentsResponse.data
-      );
-
-      setProgrammes(
-        programmesResponse.data
-      );
-
-      setLevels(
-        levelsResponse.data
-      );
-
-      setLecturers(
-        lecturersResponse.data
-      );
-
-      setCourses(
-        coursesResponse.data
-      );
-
-      setVenues(
-        venuesResponse.data
-      );
-
-      setDays(
-        daysResponse.data
-      );
-
-      setTimeSlots(
-        timeSlotsResponse.data
-      );
+      setSessions(sessionsResponse.data || []);
+      setSemesters(semestersResponse.data || []);
+      setFaculties(facultiesResponse.data || []);
+      setDepartments(departmentsResponse.data || []);
+      setProgrammes(programmesResponse.data || []);
+      setLevels(levelsResponse.data || []);
+      setLecturers(lecturersResponse.data || []);
+      setCourses(coursesResponse.data || []);
+      setVenues(venuesResponse.data || []);
+      setDays(daysResponse.data || []);
+      setTimeSlots(timeSlotsResponse.data || []);
 
     } catch (error) {
 
       console.error(error);
 
-      toast.error(
-        "Failed to load filter data."
-      );
+      toast.error("Failed to load filter data.");
 
     }
 
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Handle Filter Change
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Handle Filter Change
+  // ----------------------------------------------------
 
   const handleChange = (e) => {
 
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
 
     setFilters((previous) => ({
-
       ...previous,
-
       [name]: value,
-
     }));
 
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Apply Filters
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Apply Filters
+  // ----------------------------------------------------
 
   const handleApply = async () => {
 
     await loadTimetable(filters);
 
+    setFiltersOpen(false);
+
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Reset Filters
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Reset Filters
+  // ----------------------------------------------------
 
   const handleReset = async () => {
 
-    const resetFilters = {
-
-      sessionId: "",
-
-      semesterId: "",
-
-      facultyId: "",
-
-      departmentId: "",
-
-      programmeId: "",
-
-      levelId: "",
-
-      lecturerId: "",
-
-      courseId: "",
-
-      venueId: "",
-
-    };
-
-    setFilters(resetFilters);
+    setFilters(emptyFilters);
 
     await loadTimetable();
 
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Add Timetable Entry
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Refresh Timetable
+  // ----------------------------------------------------
+
+  const handleRefresh = async () => {
+
+    await loadTimetable(filters);
+
+  };
+
+
+  // ----------------------------------------------------
+  // Add Timetable Entry
+  // ----------------------------------------------------
 
   const handleAddSchedule = ({
     day,
@@ -358,13 +255,9 @@ function Timetables() {
   }) => {
 
     setSelectedSlot({
-
       day,
-
       timeSlot,
-
       venue,
-
     });
 
     setOpenModal(true);
@@ -372,37 +265,34 @@ function Timetables() {
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Open Generate Timetable Modal
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Generate Timetable Modal
+  // ----------------------------------------------------
 
   const handleOpenGenerateModal = () => {
-
     setOpenGenerateModal(true);
-
   };
 
-
-  /**
-   * ----------------------------------------------------
-   * Close Generate Timetable Modal
-   * ----------------------------------------------------
-   */
 
   const handleCloseGenerateModal = () => {
-
     setOpenGenerateModal(false);
+  };
+
+
+  // ----------------------------------------------------
+  // Generated Timetable Callback
+  // ----------------------------------------------------
+
+  const handleGenerated = async () => {
+
+    await loadTimetable(filters);
 
   };
 
 
-  /**
-   * ----------------------------------------------------
-   * Timetable Lookup
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Timetable Lookup
+  // ----------------------------------------------------
 
   const timetableLookup = useMemo(() => {
 
@@ -410,13 +300,10 @@ function Timetables() {
 
     timetable.forEach((entry) => {
 
-      const key =
-        `${entry.day_id}-${entry.time_slot_id}`;
+      const key = `${entry.day_id}-${entry.time_slot_id}`;
 
       if (!lookup[key]) {
-
         lookup[key] = {};
-
       }
 
       lookup[key][entry.venue_id] = entry;
@@ -428,19 +315,62 @@ function Timetables() {
   }, [timetable]);
 
 
-  /**
-   * ----------------------------------------------------
-   * Render
-   * ----------------------------------------------------
-   */
+  // ----------------------------------------------------
+  // Active Filter Count
+  // ----------------------------------------------------
+
+  const activeFilterCount = Object
+    .values(filters)
+    .filter(Boolean)
+    .length;
+
+
+  // ----------------------------------------------------
+  // Current View Summary
+  // ----------------------------------------------------
+
+  const selectedSession = sessions.find(
+    (item) => item.id === filters.sessionId
+  );
+
+  const selectedSemester = semesters.find(
+    (item) => item.id === filters.semesterId
+  );
+
+  const selectedFaculty = faculties.find(
+    (item) => item.id === filters.facultyId
+  );
+
+  const selectedDepartment = departments.find(
+    (item) => item.id === filters.departmentId
+  );
+
+  const selectedProgramme = programmes.find(
+    (item) => item.id === filters.programmeId
+  );
+
+  const selectedLevel = levels.find(
+    (item) => item.id === filters.levelId
+  );
+
+
+  const currentViewItems = [
+    selectedSession?.name,
+    selectedSemester?.name,
+    selectedFaculty?.name,
+    selectedDepartment?.name,
+    selectedProgramme?.name,
+    selectedLevel?.name,
+  ].filter(Boolean);
+
+
+  // ----------------------------------------------------
+  // Render
+  // ----------------------------------------------------
 
   return (
 
-    <div className="space-y-6 p-6">
-
-      {/* ==================================================
-          Page Header
-      ================================================== */}
+    <div className="space-y-6 p-4 sm:p-6">
 
       <PageHeader
         title="Timetables"
@@ -448,20 +378,18 @@ function Timetables() {
       />
 
 
-      {/* ==================================================
-          Page Actions
-      ================================================== */}
+      {/* Main Header */}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
 
         <div>
 
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-gray-900">
             Academic Timetable
           </h2>
 
-          <p className="text-sm text-gray-500">
-            Generate and manage scheduled lectures.
+          <p className="mt-1 text-sm text-gray-500">
+            Generate, view, and manage scheduled lectures.
           </p>
 
         </div>
@@ -470,122 +398,261 @@ function Timetables() {
         <button
           type="button"
           onClick={handleOpenGenerateModal}
-          className="
-            inline-flex
-            items-center
-            justify-center
-            rounded-lg
-            bg-green-600
-            px-5
-            py-2.5
-            text-sm
-            font-semibold
-            text-white
-            shadow-sm
-            transition
-            hover:bg-green-700
-            focus:outline-none
-            focus:ring-2
-            focus:ring-green-500
-            focus:ring-offset-2
-          "
+          className="inline-flex w-full items-center justify-center rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto"
         >
-
+          <span className="mr-2 text-base">+</span>
           Generate Timetable
-
         </button>
 
       </div>
 
 
-      {/* ==================================================
-          Filters
-      ================================================== */}
+      {/* Current View */}
 
-      <TimetableFilters
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
 
-        filters={filters}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
-        onChange={handleChange}
+          <div>
 
-        onApply={handleApply}
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Current View
+            </p>
 
-        onReset={handleReset}
+            <div className="mt-2 flex flex-wrap items-center gap-2">
 
-        sessions={sessions}
+              {currentViewItems.length > 0 ? (
 
-        semesters={semesters}
+                currentViewItems.map((item, index) => (
 
-        faculties={faculties}
+                  <span
+                    key={`${item}-${index}`}
+                    className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+                  >
+                    {item}
+                  </span>
 
-        departments={departments}
+                ))
 
-        programmes={programmes}
+              ) : (
 
-        levels={levels}
+                <span className="text-sm text-gray-500">
+                  All timetable records
+                </span>
 
-        lecturers={lecturers}
+              )}
 
-        courses={courses}
+            </div>
 
-        venues={venues}
-
-      />
+          </div>
 
 
-      {/* ==================================================
-          Timetable Grid
-      ================================================== */}
+          <div className="text-sm">
 
-      {loading ? (
+            <span className="font-semibold text-gray-900">
+              {timetable.length}
+            </span>
 
-        <div className="
-          rounded-xl
-          border
-          bg-white
-          p-10
-          text-center
-          text-gray-500
-          shadow-sm
-        ">
+            <span className="ml-1 text-gray-500">
+              scheduled entries
+            </span>
 
-          Loading timetable...
+          </div>
 
         </div>
 
-      ) : (
+      </div>
 
-        <TimetableGrid
 
-          timetable={timetable}
+      {/* Filters */}
 
-          days={days}
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 
-          timeSlots={timeSlots}
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((previous) => !previous)}
+          className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-gray-50"
+        >
 
-          venues={venues}
+          <div className="flex items-center gap-3">
 
-          timetableLookup={timetableLookup}
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
+              ⚙
+            </div>
 
-          onAddSchedule={handleAddSchedule}
+            <div>
 
-        />
+              <h3 className="text-sm font-semibold text-gray-900">
+                Timetable Filters
+              </h3>
 
-      )}
+              <p className="text-xs text-gray-500">
 
+                {activeFilterCount > 0
+                  ? `${activeFilterCount} filter${activeFilterCount > 1 ? "s" : ""} applied`
+                  : "Filter timetable by session, department, level, and more"
+                }
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <span className="text-lg text-gray-400">
+            {filtersOpen ? "−" : "+"}
+          </span>
+
+        </button>
+
+
+        {filtersOpen && (
+
+          <div className="border-t border-gray-100 p-5">
+
+            <TimetableFilters
+              filters={filters}
+              onChange={handleChange}
+              onApply={handleApply}
+              onReset={handleReset}
+              sessions={sessions}
+              semesters={semesters}
+              faculties={faculties}
+              departments={departments}
+              programmes={programmes}
+              levels={levels}
+              lecturers={lecturers}
+              courses={courses}
+              venues={venues}
+            />
+
+          </div>
+
+        )}
+
+      </div>
+
+
+      {/* Timetable */}
+
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+        <div className="flex flex-col gap-3 border-b border-gray-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+
+          <div>
+
+            <h3 className="text-lg font-semibold text-gray-900">
+              Timetable
+            </h3>
+
+            <p className="mt-1 text-sm text-gray-500">
+              View scheduled lectures by day, time, and venue.
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={loading}
+            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            ↻
+            <span className="ml-2">Refresh</span>
+          </button>
+
+        </div>
+
+
+        <div className="p-4 sm:p-5">
+
+          {loading ? (
+
+            <div className="flex min-h-[350px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center">
+
+              <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-green-600" />
+
+              <p className="text-sm font-medium text-gray-700">
+                Loading timetable...
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                Please wait while we load the schedule.
+              </p>
+
+            </div>
+
+          ) : timetable.length === 0 ? (
+
+            <div className="flex min-h-[350px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center">
+
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white text-2xl shadow-sm">
+                📅
+              </div>
+
+              <h3 className="text-base font-semibold text-gray-900">
+                No timetable available
+              </h3>
+
+              <p className="mt-2 max-w-md text-sm leading-6 text-gray-500">
+                There are no scheduled lectures matching your current filters.
+              </p>
+
+
+              {activeFilterCount > 0 && (
+
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="mt-5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  Clear Filters
+                </button>
+
+              )}
+
+            </div>
+
+                    ) : (
+
+            <div className="w-full overflow-x-auto overflow-y-hidden rounded-xl border border-gray-200">
+
+  <div className="min-w-max h-[600px] overflow-y-auto">
+
+    <TimetableGrid
+      timetable={timetable}
+      days={days}
+      timeSlots={timeSlots}
+      venues={venues}
+      timetableLookup={timetableLookup}
+      onAddSchedule={handleAddSchedule}
+    />
+
+  </div>
+
+</div>
+
+          )}
+
+        </div>
+
+      </div>
+
+      {/* Generate Timetable Modal */}
 
       <TimetableGenerateModal
+        open={openGenerateModal}
+        onClose={handleCloseGenerateModal}
+        onGenerated={handleGenerated}
+      />
 
-  open={openGenerateModal}
+    </div>
 
-  onClose={handleCloseGenerateModal}
-
-  onGenerated={handleGenerated}
-
-/>
-</div>
-);
+  );
 
 }
+
 
 export default Timetables;
