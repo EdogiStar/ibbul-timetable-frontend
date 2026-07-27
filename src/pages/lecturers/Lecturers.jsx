@@ -44,34 +44,39 @@ function Lecturers() {
   }, []);
 
   useEffect(() => {
-    const keyword = search.toLowerCase();
+  const keyword = search.toLowerCase();
 
-    setFiltered(
-      lecturers.filter(
-        (lecturer) =>
-          lecturer.full_name.toLowerCase().includes(keyword) ||
-          lecturer.staff_id.toLowerCase().includes(keyword) ||
-          lecturer.departments?.name.toLowerCase().includes(keyword)
-      )
-    );
-  }, [search, lecturers]);
+  setFiltered(
+    (lecturers || []).filter(
+      (lecturer) =>
+        lecturer.full_name
+          ?.toLowerCase()
+          .includes(keyword) ||
+        lecturer.staff_id
+          ?.toLowerCase()
+          .includes(keyword) ||
+        lecturer.departments?.name
+          ?.toLowerCase()
+          .includes(keyword)
+    )
+  );
+}, [search, lecturers]);
 
   const loadLecturers = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const response = await getLecturers();
+    const data = await getLecturers();
 
-      setLecturers(response.data);
-      setFiltered(response.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load lecturers.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    setLecturers(data);
+    setFiltered(data);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load lecturers.");
+  } finally {
+    setLoading(false);
+  }
+};
   const loadDepartments = async () => {
     try {
       const response = await getDepartments();

@@ -63,7 +63,7 @@ function CourseOfferings() {
     const keyword = search.toLowerCase();
 
     setFiltered(
-      offerings.filter(
+  (offerings || []).filter(
         (item) =>
           item.courses?.course_code
             ?.toLowerCase()
@@ -79,20 +79,20 @@ function CourseOfferings() {
   }, [search, offerings]);
 
   const loadOfferings = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const response = await getCourseOfferings();
+    const data = await getCourseOfferings();
 
-      setOfferings(response.data);
-      setFiltered(response.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load course offerings.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setOfferings(data);
+    setFiltered(data);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load course offerings.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loadCourses = async () => {
     try {
