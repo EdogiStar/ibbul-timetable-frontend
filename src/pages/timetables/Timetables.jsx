@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import api from "@/services/api";
 
 import PageHeader from "@/components/PageHeader";
 
 import TimetableFilters from "@/components/timetable/TimetableFilters";
 import TimetableGrid from "@/components/timetable/TimetableGrid";
 import TimetableGenerateModal from "@/components/timetable/TimetableGenerateModal";
+import TimetableEntryModal from "@/components/timetable/TimetableEntryModal";
 
-import { getTimetable } from "@/services/timetableService";
+import { getTimetable, createTimetableEntry,  addSingleNormalTimetable, handleClearTimetable } from "@/services/timetableService";
 
 import { getDays } from "@/services/dayService";
 import { getTimeSlots } from "@/services/timeSlotService";
@@ -21,7 +23,7 @@ import { getLevels } from "@/services/levelService";
 import { getLecturers } from "@/services/lecturerService";
 import { getCourses } from "@/services/courseService";
 import { getVenues } from "@/services/venueService";
-
+import { getCourseOfferings } from "@/services/courseOfferingService";
 
 function Timetables() {
 
@@ -33,7 +35,7 @@ function Timetables() {
   const [days, setDays] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [courseOfferings, setCourseOfferings] = useState([]);
 
   // ----------------------------------------------------
   // Timetable Entry Modal
@@ -41,7 +43,7 @@ function Timetables() {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
-
+  const [availableVenues, setAvailableVenues] = useState([]);
 
   // ----------------------------------------------------
   // Generate Timetable Modal
@@ -140,32 +142,34 @@ function Timetables() {
   const loadFilterData = async () => {
 
     try {
-
+      
       const [
-        sessionsResponse,
-        semestersResponse,
-        facultiesResponse,
-        departmentsResponse,
-        programmesResponse,
-        levelsResponse,
-        lecturersResponse,
-        coursesResponse,
-        venuesResponse,
-        daysResponse,
-        timeSlotsResponse,
-      ] = await Promise.all([
-        getSessions(),
-        getSemesters(),
-        getFaculties(),
-        getDepartments(),
-        getProgrammes(),
-        getLevels(),
-        getLecturers(),
-        getCourses(),
-        getVenues(),
-        getDays(),
-        getTimeSlots(),
-      ]);
+  sessionsResponse,
+  semestersResponse,
+  facultiesResponse,
+  departmentsResponse,
+  programmesResponse,
+  levelsResponse,
+  lecturersResponse,
+  coursesResponse,
+  venuesResponse,
+  courseOfferingsResponse,
+  daysResponse,
+  timeSlotsResponse,
+] = await Promise.all([
+  getSessions(),
+  getSemesters(),
+  getFaculties(),
+  getDepartments(),
+  getProgrammes(),
+  getLevels(),
+  getLecturers(),
+  getCourses(),
+  getVenues(),
+  getCourseOfferings(),
+  getDays(),
+  getTimeSlots(),
+]);
 
 
       setSessions(sessionsResponse.data || []);
@@ -177,6 +181,7 @@ function Timetables() {
       setLecturers(lecturersResponse.data || []);
       setCourses(coursesResponse.data || []);
       setVenues(venuesResponse.data || []);
+      setCourseOfferings(courseOfferingsResponse || []);
       setDays(daysResponse.data || []);
       setTimeSlots(timeSlotsResponse.data || []);
 
@@ -242,27 +247,186 @@ function Timetables() {
     await loadTimetable(filters);
 
   };
+  
+ // ----------------------------------------------------
+// Clear Entire Timetable
+// ----------------------------------------------------
 
+const handleClearTimetable = async () => {
+
+  if (timetable.length === 0) {
+
+    toast.info(
+      "There is no timetable to clear."
+    );
+
+    return;
+
+  }
+
+
+  const confirmed =
+    window.confirm(
+      "Are you sure you want to clear the entire timetable? This action cannot be undone."
+    );
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+  try {
+
+    setLoading(true);
+
+
+    await clearTimetable();
+
+
+    setTimetable([]);
+
+
+    toast.success(
+      "Timetable cleared successfully."
+    );
+
+
+    // Reload using current filters
+    await loadTimetable(filters);
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to clear timetable."
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
+
+  const fetchAvailableVenues = async (
+  dayId,
+  timeSlotId
+)=>{
+
+
+  const response =
+    await api.get(
+      `/timetables/available-venues`,
+      {
+        params:{
+          dayId,
+          timeSlotId,
+        }
+      }
+    );
+
+
+  return response.data.data;
+
+};
 
   // ----------------------------------------------------
   // Add Timetable Entry
   // ----------------------------------------------------
 
-  const handleAddSchedule = ({
-    day,
-    timeSlot,
-    venue,
-  }) => {
+  const handleAddSchedule = async ({
+  day,
+  timeSlot,
+}) => {
+
+
+  try {
+
+
+    const response =
+      await fetchAvailableVenues(
+        day.id,
+        timeSlot.id
+      );
+
+
+    setAvailableVenues(
+      response
+    );
+
 
     setSelectedSlot({
+
       day,
+
       timeSlot,
-      venue,
+
     });
+
 
     setOpenModal(true);
 
-  };
+
+
+  } catch(error){
+
+    console.error(error);
+
+    toast.error(
+      "Failed to load available venues"
+    );
+
+  }
+
+
+};
+
+const handleCreateSchedule = async (
+  payload
+)=>{
+
+  try{
+
+
+    await addSingleNormalTimetable(
+      payload
+    );
+
+
+    toast.success(
+      "Lecture scheduled successfully"
+    );
+
+
+    setOpenModal(false);
+
+
+    await loadTimetable(filters);
+
+
+  }catch(error){
+
+
+    console.error(error);
+
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to schedule lecture"
+    );
+
+
+  }
+
+};
 
 
   // ----------------------------------------------------
@@ -553,15 +717,34 @@ function Timetables() {
           </div>
 
 
-          <button
-            type="button"
-            onClick={handleRefresh}
-            disabled={loading}
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            ↻
-            <span className="ml-2">Refresh</span>
-          </button>
+<div className="flex flex-col gap-2 sm:flex-row">
+
+  <button
+    type="button"
+    onClick={handleRefresh}
+    disabled={loading}
+    className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    ↻
+    <span className="ml-2">
+      Refresh
+    </span>
+  </button>
+
+
+  <button
+    type="button"
+    onClick={handleClearTimetable}
+    disabled={loading || timetable.length === 0}
+    className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    🗑
+    <span className="ml-2">
+      Clear Timetable
+    </span>
+  </button>
+
+</div>
 
         </div>
 
@@ -647,6 +830,20 @@ function Timetables() {
         onClose={handleCloseGenerateModal}
         onGenerated={handleGenerated}
       />
+      
+      <TimetableEntryModal
+
+  open={openModal}
+
+  onClose={() => setOpenModal(false)}
+
+  selectedSlot={selectedSlot}
+
+  availableVenues={availableVenues}
+
+  onSubmit={handleCreateSchedule}
+
+/>
 
     </div>
 
