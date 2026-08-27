@@ -8,6 +8,8 @@ import TimetableFilters from "@/components/timetable/TimetableFilters";
 import TimetableGrid from "@/components/timetable/TimetableGrid";
 import TimetableGenerateModal from "@/components/timetable/TimetableGenerateModal";
 import TimetableEntryModal from "@/components/timetable/TimetableEntryModal";
+import ClearTimetableModal from "@/components/timetable/ClearTimetableModal";
+
 
 import {
   getTimetable,
@@ -41,7 +43,7 @@ function Timetables() {
   const [timeSlots, setTimeSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courseOfferings, setCourseOfferings] = useState([]);
-
+  const [showClearModal, setShowClearModal] = useState(false);
 
   // ----------------------------------------------------
   // Timetable Entry Modal
@@ -328,20 +330,6 @@ function Timetables() {
 
     }
 
-
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to clear the entire timetable? This action cannot be undone."
-      );
-
-
-    if (!confirmed) {
-
-      return;
-
-    }
-
-
     try {
 
       setLoading(true);
@@ -351,6 +339,7 @@ function Timetables() {
 
 
       setTimetable([]);
+      setShowClearModal(false);
 
 
       toast.success(
@@ -882,22 +871,19 @@ function Timetables() {
 
 
             <button
-              type="button"
-              onClick={handleClearTimetable}
-              disabled={
-                loading ||
-                timetable.length === 0
-              }
-              className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-
-              🗑
-
-              <span className="ml-2">
-                Clear Timetable
-              </span>
-
-            </button>
+  type="button"
+  onClick={() => setShowClearModal(true)}
+  disabled={
+    loading ||
+    timetable.length === 0
+  }
+  className="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+>
+  🗑
+  <span className="ml-2">
+    Clear Timetable
+  </span>
+</button>
 
           </div>
 
@@ -998,6 +984,13 @@ function Timetables() {
         selectedSlot={selectedSlot}
         availableVenues={availableVenues}
         onSubmit={handleCreateSchedule}
+      />
+      
+      <ClearTimetableModal
+      open={showClearModal}
+      onCancel={() => setShowClearModal(false)}
+      onConfirm={handleClearTimetable}
+      loading={loading}
       />
 
     </div>
